@@ -13,13 +13,6 @@ namespace SysClock
 {
     public partial class frm_Sysclock : Form
     {
-        // Windows API calls
-        //public const int WM_NCLBUTTONDOWN = 0xA1;
-        //public const int HT_CAPTION = 0x2;
-        //[DllImportAttribute("user32.dll")]
-        //public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        //[DllImportAttribute("user32.dll")]
-        //public static extern bool ReleaseCapture();
 
         public frm_Sysclock()
         {
@@ -35,8 +28,9 @@ namespace SysClock
 
             //Set the form size
             this.Width = 75;
-            this.Height = 60;
+            this.Height = 30;
 
+            this.MaximumSize = new Size(73, 30);
             //Set the form color
             this.BackColor = Color.CadetBlue;
             this.Font = new Font(this.Font, FontStyle.Bold);
@@ -44,7 +38,7 @@ namespace SysClock
 
 
             //Set the form to the bottom right of the screen
-            Rectangle workingArea = Screen.GetWorkingArea(this);
+            Rectangle workingArea = Screen.GetBounds(this);
             this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
 
             //Add Labels
@@ -53,14 +47,6 @@ namespace SysClock
             //Add contextMenuStrip
             this.ContextMenuStrip = cms_RightClick;
         }
-
-       
-       //Un-used code at the time being. This would be used to allow the use to drag the window by clicking anywhere on the form 
-        //private void frm_Sysclock_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    ReleaseCapture();
-        //    SendMessage(this.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0); 
-        //}
 
 
         private void CreateLabels()
@@ -72,9 +58,12 @@ namespace SysClock
                 Name = "lbl_dayLabel",
                 BackColor = Color.Transparent,
                 ForeColor = Color.White,
-                Location = new Point(30,0),
-                Text = DateTime.Now.DayOfWeek.ToString(),
-                Font = new Font(this.Font.FontFamily, 10)
+                Location = new Point(this.Size.Width -100,-5),
+                Text = DateTime.Now.DayOfWeek.ToString().Substring(0,3) + " " +  DateTime.Now.ToString("M/d/yyyy"),
+                Font = new Font(this.Font.FontFamily, 9),
+                TextAlign = System.Drawing.ContentAlignment.MiddleRight,
+                AutoSize = false
+                             
             };
 
 
@@ -83,25 +72,17 @@ namespace SysClock
                 Name = "lbl_timeLabel",
                 BackColor = Color.Transparent,
                 ForeColor = Color.White,
-                Location = new Point(30, 20),
+                Location = new Point(this.Size.Width - 100, 10),
                 Text =DateTime.Now.ToString("hh:mm:ss tt"),
-                Font = new Font(this.Font.FontFamily, 10)
+                Font = new Font(this.Font.FontFamily, 9),
+                AutoSize = false,
+                TextAlign = System.Drawing.ContentAlignment.MiddleRight
             };
 
-            Label  dateLabel = new Label
-            {
-                Name = "lbl_dateLabel",
-                BackColor = Color.Transparent,
-                ForeColor = Color.White,
-                Location = new Point(30, 40),
-                Text =DateTime.Now.ToString(),
-                Font = new Font(this.Font.FontFamily, 10)
-            };
 
             //Add Labels to the form
             this.Controls.Add(dayLabel);
             this.Controls.Add(timeLabel);
-            this.Controls.Add(dateLabel);
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -111,18 +92,23 @@ namespace SysClock
 
         private void tmr_ResetForm_Tick(object sender, EventArgs e)
         {
-            Rectangle workingArea = Screen.GetWorkingArea(this);
+            Rectangle workingArea = Screen.GetBounds(this);
             this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+           
+            this.TopMost = true;
         }
 
         private void tmr_UpdateTime_Tick(object sender, EventArgs e)
         {
            foreach (Control Label in this.Controls)
            {
+             
                if (Label.Name == "lbl_timeLabel")
+                 
                    Label.Text = DateTime.Now.ToString("hh:mm:ss tt");
-
+                    
            }
+           
         }
 
 
