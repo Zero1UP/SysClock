@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using System.Drawing;
+
 namespace SysClock
 {
     public partial class frm_Sysclock : Form
@@ -18,28 +18,17 @@ namespace SysClock
         {
             InitializeComponent();
 
-            //Set the form so it is topmost
-            this.TopMost = true;
-
             //Set some form properties so it doesn't look like a form
             this.ControlBox = false;
             this.Text = "";
             this.FormBorderStyle = FormBorderStyle.None;
 
-            //Set the form size
-            this.Width = 75;
-            this.Height = 30;
-
+            //Set the size of the form
             this.MaximumSize = new Size(73, 30);
+
             //Set the form color
             this.BackColor = Color.CadetBlue;
             this.Font = new Font(this.Font, FontStyle.Bold);
-
-
-
-            //Set the form to the bottom right of the screen
-            Rectangle workingArea = Screen.GetBounds(this);
-            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
 
             //Add Labels
             CreateLabels();
@@ -61,9 +50,8 @@ namespace SysClock
                 Location = new Point(this.Size.Width -100,-5),
                 Text = DateTime.Now.DayOfWeek.ToString().Substring(0,3) + " " +  DateTime.Now.ToString("M/d/yyyy"),
                 Font = new Font(this.Font.FontFamily, 9),
-                TextAlign = System.Drawing.ContentAlignment.MiddleRight,
-                AutoSize = false
-                             
+                TextAlign = System.Drawing.ContentAlignment.MiddleRight
+                                 
             };
 
 
@@ -75,7 +63,6 @@ namespace SysClock
                 Location = new Point(this.Size.Width - 100, 10),
                 Text =DateTime.Now.ToString("hh:mm:ss tt"),
                 Font = new Font(this.Font.FontFamily, 9),
-                AutoSize = false,
                 TextAlign = System.Drawing.ContentAlignment.MiddleRight
             };
 
@@ -100,17 +87,17 @@ namespace SysClock
 
         private void tmr_UpdateTime_Tick(object sender, EventArgs e)
         {
+
+
            foreach (Control Label in this.Controls)
            {
-             
-               if (Label.Name == "lbl_timeLabel")
-                 
+               if (Label.Name == "lbl_dayLabel")
+                   Label.Text = DateTime.Now.DayOfWeek.ToString().Substring(0, 3) + " " + DateTime.Now.ToString("M/d/yyyy"); 
+         
+               if (Label.Name == "lbl_timeLabel")            
                    Label.Text = DateTime.Now.ToString("hh:mm:ss tt");
-                    
-           }
            
+           }            
         }
-
-
     }
 }
