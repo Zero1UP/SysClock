@@ -8,14 +8,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Configuration;
 
 namespace SysClock
 {
     public partial class frm_Sysclock : Form
     {
 
+        //Windows API Calls
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+        [DllImportAttribute("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [DllImportAttribute("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+
         public frm_Sysclock()
         {
+
+
             InitializeComponent();
 
             //Set some form properties so it doesn't look like a form
@@ -35,8 +47,23 @@ namespace SysClock
 
             //Add contextMenuStrip
             this.ContextMenuStrip = cms_RightClick;
-        }
 
+
+            //Decide if we are loading the users desired location or defaulting to the lower right of the screen
+            //The user is able to make this change on the right click menu. All they have to do is click the button and it will change accordingly. It will be bottom right by default
+            if(Properties.Settings.Default.alwaysBottomRight)
+            {
+                tmr_ResetForm.Enabled = true;
+                conbtn_Switcher.Text = "Always Bottom Right: True";
+            }
+            else
+            {
+                this.Location = new Point(Properties.Settings.Default.windowPos.X, Properties.Settings.Default.windowPos.Y);
+                this.TopMost = true;
+                conbtn_Switcher.Text = "Always Bottom Right: False";
+            }
+
+        }
 
         private void CreateLabels()
         {
@@ -80,8 +107,7 @@ namespace SysClock
         private void tmr_ResetForm_Tick(object sender, EventArgs e)
         {
             Rectangle workingArea = Screen.GetBounds(this);
-            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
-           
+            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);          
             this.TopMost = true;
         }
 
@@ -99,5 +125,34 @@ namespace SysClock
            
            }            
         }
+
+        private void frm_Sysclock_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            Properties.Settings.Default.windowPos = new Point(this.Location.X, this.Location.Y);
+            Properties.Settings.Default.Save();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (conbtn_Switcher.Text == "Always Bottom Right: True")
+            {
+                conbtn_Switcher.Text = "Always Bottom Right: False";
+                Properties.Settings.Default.alwaysBottomRight = false;
+                Properties.Settings.Default.Save();
+                tmr_ResetForm.Enabled = false;
+           
+            }
+            else if (conbtn_Switcher.Text == "Always Bottom Right: False")
+            {
+                conbtn_Switcher.Text = "Always Bottom Right: True";
+                Properties.Settings.Default.alwaysBottomRight = true;
+                Properties.Settings.Default.Save();
+                tmr_ResetForm.Enabled = true;
+
+            }
+        }
+
     }
 }
